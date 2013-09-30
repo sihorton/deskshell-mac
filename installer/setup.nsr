@@ -1,0 +1,20 @@
+/**
+* nodejs file to setup mac outputs.
+*/
+var fs = require("fs-extra"),Q = require("q");
+Q.nfapply(fs.mkdir,[__dirname+"/Deskshell.app"])
+.then(function() {
+	console.log("creating Deskshell.app");
+	return Q.nfapply(fs.mkdir,[__dirname+"/Deskshell.app/Contents/"]);
+}).then(function() {
+	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/MacOS",__dirname+"/Deskshell.app/Contents/MacOS"]);
+}).then(function() {
+	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/node_modules",__dirname+"/Deskshell.app/Contents/node_modules"]);
+}).then(function() {
+	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/Info.plist",__dirname+"/Deskshell.app/Contents/Info.plist"]);
+}).then(function() {
+	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/PkgInfo",__dirname+"/Deskshell.app/Contents/PkgInfo"]);
+}).fail(function(err) {
+	console.log(err);
+});
+//fs.copyRecursive
