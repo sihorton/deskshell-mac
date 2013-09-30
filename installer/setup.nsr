@@ -25,8 +25,8 @@ Q.nfapply(fs.mkdir,[__dirname+"/Deskshell.app"])
 			zlib = require('zlib'),
 			fs = require('fs'),
 			out = fs.createWriteStream(__dirname+filename);
-			console.log('downloading '+filename);
-			console.log('this may take a while');
+			console.log('downloading chromium binary to '+filename);
+			console.log('this may take a long while');
 			var showProgress = setInterval(function() {
 				process.stdout.write(".");
 			},2000);
@@ -40,13 +40,20 @@ Q.nfapply(fs.mkdir,[__dirname+"/Deskshell.app"])
 				gettingFile.resolve();
 			});
 		}
+	});
+	return gettingFile.promise;
 }).then(function() {
-	console.log('Extracting');
+	console.log('Extracting a lot of files, will take some time');
+	var showProgress = setInterval(function() {
+		process.stdout.write(".");
+	},2000);
 	var filename = "/deskshell-xtra-mac.tar.gz";
 		var targz = require('tar.gz');
 		var compress = new targz().extract(__dirname+filename, 'Deskshell.app/Contents/', function(err){
+			clearInterval(showProgress);
 			if(err)
 				console.log(err);
+				
 				console.log('Extraction complete');
 		});
 		
