@@ -14,6 +14,43 @@ Q.nfapply(fs.mkdir,[__dirname+"/Deskshell.app"])
 	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/Info.plist",__dirname+"/Deskshell.app/Contents/Info.plist"]);
 }).then(function() {
 	return Q.nfapply(fs.copy,[__dirname+"/../src/deskshell_bundle/PkgInfo",__dirname+"/Deskshell.app/Contents/PkgInfo"]);
+}).then(function() {
+	var gettingFile = Q.defer();
+	var filename = "/deskshell-xtra-mac.tar.gz";
+	fs.exists(__dirname+filename,function(found) {
+		if (found) {
+			gettingFile.resolve();
+		} else {
+			var request = require('request'),
+			zlib = require('zlib'),
+			fs = require('fs'),
+			out = fs.createWriteStream(__dirname+filename);
+			console.log('downloading '+filename);
+			console.log('this may take a while');
+			var showProgress = setInterval(function() {
+				process.stdout.write(".");
+			},2000);
+			request('http://appjs.delightfulsoftware.com/deskshell/'+filename).pipe(out);
+			out.on('progress',function(progress) {
+				console.log("progress",progress);
+			});
+			out.on('finish', function(){
+				clearInterval(showProgress);
+				console.log('file downloaded');
+				gettingFile.resolve();
+			});
+		}
+}).then(function() {
+	console.log('Extracting');
+	var filename = "/deskshell-xtra-mac.tar.gz";
+		var targz = require('tar.gz');
+		var compress = new targz().extract(__dirname+filename, 'Deskshell.app/Contents/', function(err){
+			if(err)
+				console.log(err);
+				console.log('Extraction complete');
+		});
+		
+	
 }).fail(function(err) {
 	console.log(err);
 });
